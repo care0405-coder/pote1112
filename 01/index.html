@@ -33,7 +33,9 @@
                 </button>
             </div>
             <div class="p-4 pt-0">
-                <img src="unnamed.png" alt="전시 기획 인포그래픽" class="w-full h-auto rounded-lg shadow-inner" onerror="this.src='https://placehold.co/1200x800?text=Infographic+Image+Not+Found'">
+                <!-- 시스템 파일명은 unnamed.jpg이므로 이를 기본으로 사용합니다. -->
+                <img src="unnamed.jpg" id="modal-img" alt="전시 기획 인포그래픽" class="w-full h-auto rounded-lg shadow-inner" 
+                     onerror="if (this.src.indexOf('.jpg') !== -1) this.src='unnamed.png'; else this.src='https://placehold.co/1200x800?text=Image+Not+Found';">
             </div>
             <div class="p-4 bg-slate-800/50 border-t border-slate-700 text-center text-slate-400 text-sm">
                 전시 기획 전략 인포그래픽: 속도의 권력과 디지털 상호작용
@@ -49,8 +51,8 @@
         </div>
         
         <div class="z-10 text-center px-4 max-w-5xl">
-            <!-- Header Badges Area -->
-            <div class="flex flex-wrap items-center justify-center gap-3 mb-6 animate-bounce">
+            <!-- Header Badges Area: 클릭을 방해하던 애니메이션을 제거했습니다. -->
+            <div class="flex flex-wrap items-center justify-center gap-3 mb-6">
                 <!-- Home Button -->
                 <a href="../index.html" class="flex items-center gap-2 px-4 py-1 bg-slate-800/50 hover:bg-slate-700 text-white text-sm font-semibold rounded-full transition-all shadow-lg active:scale-95 border border-slate-700">
                     <i data-lucide="home" class="w-4 h-4"></i>
@@ -279,12 +281,15 @@
         window.onscroll = function() {
             const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
             const progress = (window.scrollY / totalHeight) * 100;
-            document.getElementById('progress-bar').style.width = progress + "%";
+            const bar = document.getElementById('progress-bar');
+            if (bar) bar.style.width = progress + "%";
         };
 
         // Modal Logic
         function toggleModal(show) {
             const modal = document.getElementById('infographic-modal');
+            if (!modal) return;
+            
             if (show) {
                 modal.classList.remove('hidden');
                 modal.classList.add('flex');
@@ -297,9 +302,12 @@
         }
 
         // Close modal when clicking background
-        document.getElementById('infographic-modal').onclick = function(e) {
-            if (e.target === this) toggleModal(false);
-        };
+        const modalElement = document.getElementById('infographic-modal');
+        if (modalElement) {
+            modalElement.onclick = function(e) {
+                if (e.target === this) toggleModal(false);
+            };
+        }
 
         // Tab Switch Logic
         function setActiveStage(index) {
@@ -311,36 +319,42 @@
                 if (idx === index) {
                     btn.classList.add('border-blue-500', 'bg-slate-800', 'shadow-[0_0_30px_-10px_rgba(59,130,246,0.5)]');
                     btn.classList.remove('border-transparent', 'bg-slate-950/50', 'grayscale');
-                    btn.querySelector('p').className = "text-sm text-blue-300";
+                    const p = btn.querySelector('p');
+                    if (p) p.className = "text-sm text-blue-300";
                 } else {
                     btn.classList.remove('border-blue-500', 'bg-slate-800', 'shadow-[0_0_30px_-10px_rgba(59,130,246,0.5)]');
                     btn.classList.add('border-transparent', 'bg-slate-950/50', 'grayscale');
-                    btn.querySelector('p').className = "text-sm text-slate-500";
+                    const p = btn.querySelector('p');
+                    if (p) p.className = "text-sm text-slate-500";
                 }
             });
 
             // Update Content Area
             const contentArea = document.getElementById('stage-content');
-            contentArea.className = `p-10 rounded-3xl bg-gradient-to-br ${stage.color} transition-all duration-700 min-h-[400px] flex flex-col md:flex-row gap-12 items-center`;
-            
-            document.getElementById('stage-title').textContent = stage.title;
-            document.getElementById('stage-desc').textContent = `"${stage.description}"`;
-            
-            // Update Icon
-            const iconBox = document.getElementById('stage-icon-box');
-            iconBox.innerHTML = `<i data-lucide="${stage.icon}" class="w-32 h-32 text-white/50"></i>`;
-            
-            // Update List
-            const listContainer = document.getElementById('stage-list');
-            listContainer.innerHTML = stage.content.map(item => `
-                <div class="flex items-start gap-4 bg-white/10 p-4 rounded-xl backdrop-blur-sm">
-                    <i data-lucide="chevron-right" class="mt-1 flex-shrink-0 text-white w-4 h-4"></i>
-                    <div>
-                        <span class="block font-bold text-white">${item.label}</span>
-                        <span class="text-sm text-blue-100/70">${item.text}</span>
-                    </div>
-                </div>
-            `).join('');
+            if (contentArea) {
+                contentArea.className = `p-10 rounded-3xl bg-gradient-to-br ${stage.color} transition-all duration-700 min-h-[400px] flex flex-col md:flex-row gap-12 items-center`;
+                
+                const title = document.getElementById('stage-title');
+                const desc = document.getElementById('stage-desc');
+                const iconBox = document.getElementById('stage-icon-box');
+                const listContainer = document.getElementById('stage-list');
+
+                if (title) title.textContent = stage.title;
+                if (desc) desc.textContent = `"${stage.description}"`;
+                if (iconBox) iconBox.innerHTML = `<i data-lucide="${stage.icon}" class="w-32 h-32 text-white/50"></i>`;
+                
+                if (listContainer) {
+                    listContainer.innerHTML = stage.content.map(item => `
+                        <div class="flex items-start gap-4 bg-white/10 p-4 rounded-xl backdrop-blur-sm">
+                            <i data-lucide="chevron-right" class="mt-1 flex-shrink-0 text-white w-4 h-4"></i>
+                            <div>
+                                <span class="block font-bold text-white">${item.label}</span>
+                                <span class="text-sm text-blue-100/70">${item.text}</span>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            }
 
             // Re-create icons for new elements
             lucide.createIcons();
