@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="ko" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>영화를 보는 시각: 비평의 미학</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Noto Sans KR', 'sans-serif'],
+                        serif: ['Noto Serif KR', 'serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&family=Noto+Serif+KR:ital,wght@0,400;0,700;1,400&display=swap');
+        
+        body {
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        @keyframes fade-in {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-fade-in {
+            animation: fade-in 1s ease-out forwards;
+        }
+
+        #cursor-glow {
+            transition: transform 0.1s ease-out;
+            will-change: transform;
+        }
+
+        .lens-content {
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 selection:bg-amber-500/30 overflow-x-hidden">
+
+    <!-- Interactive Cursor Glow (Only visible in dark mode or subtle in light) -->
+    <div id="cursor-glow" class="fixed pointer-events-none z-50 w-64 h-64 rounded-full bg-blue-500/10 dark:bg-blue-500/10 blur-[100px] -translate-x-1/2 -translate-y-1/2"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-40 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <i data-lucide="camera" class="text-amber-500 w-6 h-6"></i>
+                <span class="text-xl font-bold tracking-tighter uppercase">Film Critique 101</span>
+            </div>
+            <div class="flex gap-4 md:gap-8 text-sm font-medium items-center">
+                <div class="hidden md:flex gap-8 text-slate-600 dark:text-slate-400">
+                    <a href="#" class="hover:text-amber-500 transition-colors">Course</a>
+                    <a href="#" class="hover:text-amber-500 transition-colors">Methodology</a>
+                    <a href="#" class="hover:text-amber-500 transition-colors">Resources</a>
+                </div>
+                
+                <!-- Theme Toggle Button -->
+                <button onclick="toggleTheme()" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-slate-800 dark:text-slate-200" title="테마 변경">
+                    <i id="theme-icon" data-lucide="moon" class="w-5 h-5"></i>
+                </button>
+
+                <button onclick="navigateToIndex()" class="bg-amber-500 text-slate-950 px-5 py-2 rounded-full hover:bg-amber-400 transition-all font-bold">
+                    Join
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="relative h-screen flex items-center justify-center overflow-hidden">
+        <div class="absolute inset-0 z-0">
+            <div class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-slate-50 dark:to-slate-950 z-10"></div>
+            <!-- Background Image with Overlay -->
+            <div class="absolute inset-0 opacity-30 dark:opacity-20 bg-[url('https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80&w=2000')] bg-cover bg-center grayscale scale-110 motion-safe:animate-pulse"></div>
+        </div>
+
+        <div class="relative z-20 text-center px-6 max-w-4xl">
+            <p class="text-amber-600 dark:text-amber-500 font-mono tracking-widest mb-4 animate-fade-in uppercase">Beyond the Surface</p>
+            <h1 class="text-6xl md:text-8xl font-black mb-8 leading-tight tracking-tighter animate-fade-in">
+                영화를 보는 <br/>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-orange-600">
+                    네 가지 시각
+                </span>
+            </h1>
+            <p class="text-xl text-slate-600 dark:text-slate-400 mb-10 leading-relaxed max-w-2xl mx-auto animate-fade-in" style="animation-delay: 0.2s;">
+                단순한 감상을 넘어 비평의 눈을 가질 때, 영화는 비로소 하나의 우주가 됩니다. 
+                교수님과 함께하는 16주간의 시각적 탐험.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in" style="animation-delay: 0.4s;">
+                <button class="px-8 py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-950 rounded-lg font-bold flex items-center justify-center gap-2 hover:bg-slate-800 dark:hover:bg-slate-200 transition-all group shadow-lg">
+                    <i data-lucide="play" class="w-5 h-5 fill-current"></i>
+                    수업 소개 영상 보기
+                </button>
+                <button onclick="navigateToIndex()" class="px-8 py-4 bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-lg font-bold border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all shadow-sm">
+                    커리큘럼 확인하기
+                </button>
+            </div>
+        </div>
+
+        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce opacity-50">
+            <div class="w-6 h-10 border-2 border-slate-400 dark:border-white rounded-full flex justify-center pt-2">
+                <div class="w-1 h-2 bg-slate-400 dark:bg-white rounded-full"></div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Interactive Methodology Section -->
+    <section class="py-32 px-6 bg-slate-100/50 dark:bg-slate-900/50">
+        <div class="max-w-7xl mx-auto">
+            <div class="mb-20 text-center">
+                <h2 class="text-4xl font-bold mb-4 italic">The Critical Lens</h2>
+                <p class="text-slate-600 dark:text-slate-400">아이콘을 클릭하여 비평의 다양한 관점을 체험해보세요.</p>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-16 items-center">
+                <!-- Left: Interactive Display -->
+                <div id="viewfinder" class="relative aspect-video rounded-2xl bg-slate-900 overflow-hidden shadow-2xl border border-slate-700 group">
+                    <div id="lens-overlay" class="absolute inset-0 bg-gradient-to-br from-blue-500 to-cyan-400 opacity-20 transition-all duration-700"></div>
+                    
+                    <!-- Viewfinder UI -->
+                    <div class="absolute inset-8 border border-white/20 pointer-events-none z-10 flex flex-col justify-between p-4">
+                        <div class="flex justify-between">
+                            <div class="w-8 h-8 border-t-2 border-l-2 border-amber-500 viewfinder-corner"></div>
+                            <div class="w-8 h-8 border-t-2 border-r-2 border-amber-500 viewfinder-corner"></div>
+                        </div>
+                        <div class="flex justify-center text-[10px] font-mono text-white/40 tracking-[0.5em]">REC ● 24FPS</div>
+                        <div class="flex justify-between">
+                            <div class="w-8 h-8 border-b-2 border-l-2 border-amber-500 viewfinder-corner"></div>
+                            <div class="w-8 h-8 border-b-2 border-r-2 border-amber-500 viewfinder-corner"></div>
+                        </div>
+                    </div>
+
+                    <!-- Content inside Viewfinder (Always dark themed for "camera" feel) -->
+                    <div class="absolute inset-0 flex items-center justify-center p-12 text-center overflow-hidden">
+                        <div id="lens-display-content" class="space-y-6 transition-all duration-700">
+                            <div id="lens-icon-container" class="inline-block p-4 rounded-full bg-white/10 backdrop-blur-md mb-4 group-hover:scale-110 transition-transform text-white">
+                                <i data-lucide="layers" class="w-8 h-8"></i>
+                            </div>
+                            <h3 id="lens-title" class="text-3xl font-bold text-white">미장센 (Mise-en-Scène)</h3>
+                            <p id="lens-desc" class="text-lg text-slate-300 leading-relaxed">
+                                프레임 안에 놓인 모든 것. 조명, 세트, 의상, 그리고 배우의 배치가 만드는 시각적 언어를 분석합니다.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Selector List -->
+                <div class="space-y-4" id="lens-selectors">
+                    <!-- Buttons will be rendered by JS -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quote Section -->
+    <section class="py-40 px-6 relative overflow-hidden">
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[15rem] md:text-[20rem] font-black text-slate-200 dark:text-white/[0.02] whitespace-nowrap pointer-events-none uppercase transition-colors">
+            Cinema is Truth
+        </div>
+        <div class="max-w-4xl mx-auto text-center relative z-10">
+            <i data-lucide="book-open" class="w-12 h-12 text-amber-500 mx-auto mb-8 opacity-50"></i>
+            <blockquote class="text-3xl md:text-5xl font-serif italic leading-snug mb-8">
+                "영화는 세계에서 가장 아름다운 사기다."
+            </blockquote>
+            <cite class="text-slate-500 dark:text-slate-400 font-mono tracking-widest not-italic uppercase transition-colors">— Jean-Luc Godard</cite>
+        </div>
+    </section>
+
+    <!-- CTA / Footer -->
+    <footer class="bg-white dark:bg-slate-950 border-t border-slate-200 dark:border-slate-900 py-20 px-6">
+        <div class="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+            <div>
+                <h2 class="text-4xl font-bold mb-6">당신의 시각을 확장할 준비가 되었나요?</h2>
+                <p class="text-slate-600 dark:text-slate-400 text-lg mb-8">
+                    이번 학기, 우리는 10편의 걸작을 통해 영화를 해체하고 다시 조립할 것입니다. 
+                    비평은 관객에서 창작자로 나아가는 첫 걸음입니다.
+                </p>
+                <div class="flex gap-4">
+                    <button onclick="navigateToIndex()" class="flex-1 bg-amber-500 text-slate-950 py-4 rounded-lg font-bold text-lg hover:bg-amber-400 transition-all shadow-lg shadow-amber-500/20">
+                        수강 신청하기
+                    </button>
+                    <button class="p-4 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-all">
+                        <i data-lucide="message-square" class="w-6 h-6"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="bg-slate-50 dark:bg-slate-900 p-8 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-amber-500/50 transition-all">
+                    <div class="text-3xl font-bold text-amber-600 dark:text-amber-500 mb-2">16+</div>
+                    <div class="text-slate-500 dark:text-slate-400 text-sm">Critical Theories</div>
+                </div>
+                <div class="bg-slate-50 dark:bg-slate-900 p-8 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-amber-500/50 transition-all">
+                    <div class="text-3xl font-bold text-amber-600 dark:text-amber-500 mb-2">10</div>
+                    <div class="text-slate-500 dark:text-slate-400 text-sm">Masterpieces</div>
+                </div>
+                <div class="bg-slate-50 dark:bg-slate-900 p-8 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-amber-500/50 transition-all">
+                    <div class="text-3xl font-bold text-amber-600 dark:text-amber-500 mb-2">∞</div>
+                    <div class="text-slate-500 dark:text-slate-400 text-sm">Interpretations</div>
+                </div>
+                <div class="bg-slate-50 dark:bg-slate-900 p-8 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-amber-500/50 transition-all">
+                    <div class="text-3xl font-bold text-amber-600 dark:text-amber-500 mb-2">24</div>
+                    <div class="text-slate-500 dark:text-slate-400 text-sm">FPS of Truth</div>
+                </div>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto mt-20 pt-8 border-t border-slate-200 dark:border-slate-900 text-center text-slate-400 dark:text-slate-600 text-xs">
+            © 2025 Film Studies Department. Ways of Seeing Film: The Aesthetics of Criticism.
+        </div>
+    </footer>
+
+    <script>
+        // --- Data ---
+        const lenses = [
+            {
+                title: "미장센 (Mise-en-Scène)",
+                description: "프레임 안에 놓인 모든 것. 조명, 세트, 의상, 그리고 배우의 배치가 만드는 시각적 언어를 분석합니다.",
+                icon: "layers",
+                color: "from-blue-500 to-cyan-400"
+            },
+            {
+                title: "몽타주 & 편집 (Editing)",
+                description: "쇼트와 쇼트의 충돌이 만드는 제3의 의미. 시간과 공간을 재구성하는 영화적 마술을 탐구합니다.",
+                icon: "film",
+                color: "from-purple-500 to-pink-500"
+            },
+            {
+                title: "정치적/사회적 맥락 (Context)",
+                description: "영화는 시대를 비추는 거울입니다. 스크린 너머에 숨겨진 권력 관계와 사회적 담론을 읽어냅니다.",
+                icon: "eye",
+                color: "from-red-500 to-orange-500"
+            },
+            {
+                title: "정신분석학적 접근 (Psychology)",
+                description: "관객의 욕망과 카메라의 시선. 스크린이 우리의 무의식을 어떻게 자극하는지 분석합니다.",
+                icon: "focus",
+                color: "from-emerald-500 to-teal-500"
+            }
+        ];
+
+        let activeLensIndex = 0;
+
+        // --- Navigation ---
+        function navigateToIndex() {
+            window.location.href = './01/index.html';
+        }
+
+        // --- Theme Management ---
+        function toggleTheme() {
+            const html = document.documentElement;
+            const themeIcon = document.getElementById('theme-icon');
+            
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                themeIcon.setAttribute('data-lucide', 'sun');
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.classList.add('dark');
+                themeIcon.setAttribute('data-lucide', 'moon');
+                localStorage.setItem('theme', 'dark');
+            }
+            lucide.createIcons();
+            renderSelectors(); // Re-render selectors to update colors based on theme
+        }
+
+        // --- Interaction Logic ---
+        const cursorGlow = document.getElementById('cursor-glow');
+        const lensSelectorsContainer = document.getElementById('lens-selectors');
+        const lensTitle = document.getElementById('lens-title');
+        const lensDesc = document.getElementById('lens-desc');
+        const lensOverlay = document.getElementById('lens-overlay');
+        const lensIconContainer = document.getElementById('lens-icon-container');
+        const lensDisplayContent = document.getElementById('lens-display-content');
+
+        // Mouse Tracker
+        window.addEventListener('mousemove', (e) => {
+            cursorGlow.style.left = `${e.clientX}px`;
+            cursorGlow.style.top = `${e.clientY}px`;
+        });
+
+        // Render Lens Buttons
+        function renderSelectors() {
+            const isDark = document.documentElement.classList.contains('dark');
+            lensSelectorsContainer.innerHTML = '';
+            
+            lenses.forEach((lens, index) => {
+                const isActive = index === activeLensIndex;
+                const button = document.createElement('button');
+                
+                button.className = `w-full text-left p-6 rounded-xl border transition-all duration-300 flex items-center gap-6 ${
+                    isActive 
+                    ? `bg-white dark:bg-slate-800 border-amber-500 shadow-[0_0_20px_rgba(245,158,11,0.15)] translate-x-4` 
+                    : `bg-transparent border-slate-200 dark:border-slate-800 hover:border-slate-400 dark:hover:border-slate-600`
+                }`;
+                
+                button.innerHTML = `
+                    <div class="p-3 rounded-lg ${isActive ? 'bg-amber-500 text-slate-950' : 'bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400'}">
+                        <i data-lucide="${lens.icon}" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-xl font-bold ${isActive ? 'text-slate-900 dark:text-white' : 'text-slate-400 dark:text-slate-600'}">
+                            ${lens.title}
+                        </h4>
+                        <p class="text-sm text-slate-400 dark:text-slate-500 mt-1">Explore this perspective</p>
+                    </div>
+                    <i data-lucide="chevron-right" class="ml-auto w-5 h-5 transition-transform ${isActive ? 'rotate-90 opacity-100 text-amber-500' : 'opacity-0'}"></i>
+                `;
+
+                button.onclick = () => updateActiveLens(index);
+                lensSelectorsContainer.appendChild(button);
+            });
+            lucide.createIcons();
+        }
+
+        function updateActiveLens(index) {
+            if (activeLensIndex === index) return;
+            
+            lensDisplayContent.style.opacity = '0';
+            lensDisplayContent.style.transform = 'translateY(10px)';
+            
+            setTimeout(() => {
+                activeLensIndex = index;
+                const lens = lenses[index];
+                
+                lensTitle.innerText = lens.title;
+                lensDesc.innerText = lens.description;
+                lensOverlay.className = `absolute inset-0 bg-gradient-to-br ${lens.color} opacity-20 transition-all duration-700`;
+                lensIconContainer.innerHTML = `<i data-lucide="${lens.icon}" class="w-8 h-8"></i>`;
+                
+                lensDisplayContent.style.opacity = '1';
+                lensDisplayContent.style.transform = 'translateY(0)';
+                
+                renderSelectors();
+            }, 300);
+        }
+
+        // Initial Load
+        window.onload = () => {
+            // Check saved theme
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'light') {
+                document.documentElement.classList.remove('dark');
+                document.getElementById('theme-icon').setAttribute('data-lucide', 'sun');
+            }
+            
+            lucide.createIcons();
+            renderSelectors();
+        };
+    </script>
+</body>
+</html>
